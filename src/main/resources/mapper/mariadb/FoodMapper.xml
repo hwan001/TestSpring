@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.FoodMapper">
+
+	<update id="createFoodStockTable"> 
+		CREATE TABLE IF NOT EXISTS food_stock ( 
+			id INT AUTO_INCREMENT PRIMARY KEY, 
+			arrival_date DATE NOT NULL, 
+			name VARCHAR(100) NOT NULL, 
+			unit_weight
+			DECIMAL(10,2) NOT NULL, 
+			quantity INT NOT NULL, 
+			total_price DECIMAL(10,2) NOT NULL,
+			unit_price DECIMAL(10,2) AS (total_price / quantity) STORED 
+		) 
+	</update>
+
+	<insert id="insertFoodStock" parameterType="com.example.dto.FoodStockDto"> 
+		INSERT INTO food_stock (arrival_date, name, unit_weight, quantity, total_price) VALUES (#{arrivalDate}, #{name}, #{unitWeight}, #{quantity}, #{totalPrice}) 
+	</insert>
+
+	<select id="getStockSummary" resultType="com.example.dto.StockSummaryDto"> 
+		SELECT
+			fs.id AS id,
+			fs.name AS name,
+			fs.arrival_date AS arrivalDate,
+			fs.unit_weight AS unitWeight,
+			fs.quantity AS quantity,
+			fs.total_price AS totalPrice,
+			IFNULL(SUM(fu.used_quantity), 0) AS usedQuantity,
+			<![CDATA[
+			    fs.quantity - IFNULL(SUM(fu.used_quantity), 0)
+			]]> AS remainingQuantity,
+			<![CDATA[ IF(ROUND(fs.quantity - IFNULL(SUM(fu.used_quantity), 0) / fs.unit_weight, 2) <= 0, 1, 0) ]]> AS isCompleted,
+			fs.total_price / fs.quantity * IFNULL(SUM(fu.used_quantity), 0) AS usedCost,
+			fs.total_price / fs.quantity * (fs.quantity - IFNULL(SUM(fu.used_quantity), 0)) AS remainingCost
+		FROM food_stock fs LEFT JOIN food_usage fu ON fs.id = fu.stock_id 
+		GROUP BY fs.id 
+	</select>
+
+	<select id="getAllStocks" resultType="com.example.dto.FoodStockDto"> 
+		SELECT id,
+			name,
+			arrival_date AS arrivalDate,
+			unit_weight AS unitWeight,
+			quantity,
+			total_price AS totalPrice
+		FROM food_stock 
+	</select>
+
+	<insert id="insertUsage" parameterType="com.example.domain.FoodUsage"> 
+		INSERT INTO food_usage (stock_id, used_quantity) VALUES (#{stockId}, #{usedQuantity}) 
+	</insert>
+
+	<update id="createFoodUsageTable"> 
+		CREATE TABLE IF NOT EXISTS food_usage ( 
+			id INT PRIMARY KEY AUTO_INCREMENT, 
+			stock_id INT NOT NULL, 
+			used_quantity DECIMAL(10,2) NOT NULL, 
+			used_at DATETIME DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY (stock_id) REFERENCES food_stock(id) ON DELETE CASCADE 
+		) 
+	</update>
+
+	<update id="createSummaryView"> 
+		CREATE OR REPLACE VIEW food_stock_summary AS 
+		SELECT fs.id,
+			fs.arrival_date, fs.name, fs.unit_weight, fs.quantity, fs.total_price, fs.total_price / fs.quantity AS unit_price, 
+			IFNULL(SUM(fu.used_quantity), 0) AS used_quantity, fs.quantity - IFNULL(SUM(fu.used_quantity), 0) AS remaining_quantity, 
+			(fs.total_price / fs.quantity) * IFNULL(SUM(fu.used_quantity), 0) AS used_cost, 
+			(fs.total_price / fs.quantity) * (fs.quantity - IFNULL(SUM(fu.used_quantity), 0)) AS remaining_cost 
+		FROM food_stock fs LEFT JOIN food_usage fu ON fs.id = fu.stock_id 
+		GROUP BY fs.id 
+	</update>
+
+	<select id="getRemainingQuantity" parameterType="int" resultType="BigDecimal">
+	    SELECT quantity - IFNULL(SUM(used_quantity), 0)
+	    FROM food_stock fs LEFT JOIN food_usage fu ON fs.id = fu.stock_id
+	    WHERE fs.id = #{stockId}
+	    GROUP BY fs.id
+	</select>
+</mapper>
