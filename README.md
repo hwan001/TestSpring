@@ -22,4 +22,20 @@ docker exec -it mariadb mariadb -u HJH -pHJH
 use householdledger;
 show tables;
 select * from food_stock;
+
+
+# 톰캣 인코딩 확인
+docker exec -it spring-tomcat bash
+java -XshowSettings:properties -version 2>&1 | grep file.encoding
+
+
 ```
+
+### config
+- MultipartConfig.java -> 파일 업로드 config
+- TransactionConfig.java 
+- WebConfig.java
+- MyBatisConfig.java
+- SessionConfig.java
+
+

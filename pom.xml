@@ -55,6 +55,13 @@
 			<version>1.2</version>
 		</dependency>
 
+		<!-- file upload -->
+		<dependency>
+			<groupId>commons-fileupload</groupId>
+			<artifactId>commons-fileupload</artifactId>
+			<version>1.4</version> <!-- 또는 호환되는 최신 버전 -->
+		</dependency>
+
 		<!-- Logging -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -149,6 +156,13 @@
 			<groupId>com.fasterxml.jackson.datatype</groupId>
 			<artifactId>jackson-datatype-jsr310</artifactId>
 			<version>2.17.1</version> <!-- Jackson 버전에 맞게 수정 -->
+		</dependency>
+
+		<!-- yaml -->
+		<dependency>
+			<groupId>org.yaml</groupId>
+			<artifactId>snakeyaml</artifactId>
+			<version>1.33</version> <!-- 또는 안정적인 최신 버전 -->
 		</dependency>
 
 		<!-- java 9 이상이면 아래 의존성 추가 -->

@@ -10,6 +10,8 @@
 
 <resources mapping="/resources/**" location="/resources/" />
 <resources mapping="/assets/**" location="/assets/" />
+<resources mapping="/uploads/**" location="file:/usr/local/tomcat/webapps/ROOT/uploads/" />
+
 
 <!-- @RequestMapping 처리 -->
 <annotation-driven />
@@ -33,9 +35,11 @@
 </beans:bean>
 
 <!-- @Controller 스캔 -->
-<context:component-scan base-package="com.example.controller" />
-<context:component-scan base-package="com.example.service" />
-<context:component-scan base-package="com.example.mapper" />
+<!-- <context:component-scan base-package="com.example.controller" />
+<context:component-scan base-package="com.example.service" /> -->
+<context:component-scan base-package="com.example" />
 <context:component-scan base-package="com.mybatis" />
+
+
 
 </beans:beans>

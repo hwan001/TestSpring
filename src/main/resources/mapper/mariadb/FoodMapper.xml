@@ -6,6 +6,7 @@
 		CREATE TABLE IF NOT EXISTS food_stock ( 
 			id INT AUTO_INCREMENT PRIMARY KEY, 
 			arrival_date DATE NOT NULL, 
+			image_url VARCHAR(200),
 			name VARCHAR(100) NOT NULL, 
 			unit_weight
 			DECIMAL(10,2) NOT NULL, 
@@ -16,14 +17,15 @@
 	</update>
 
 	<insert id="insertFoodStock" parameterType="com.example.dto.FoodStockDto"> 
-		INSERT INTO food_stock (arrival_date, name, unit_weight, quantity, total_price) VALUES (#{arrivalDate}, #{name}, #{unitWeight}, #{quantity}, #{totalPrice}) 
+		INSERT INTO food_stock (arrival_date, image_url, name, unit_weight, quantity, total_price) VALUES (#{arrivalDate}, #{imageUrl}, #{name}, #{unitWeight}, #{quantity}, #{totalPrice}) 
 	</insert>
 
 	<select id="getStockSummary" resultType="com.example.dto.StockSummaryDto"> 
 		SELECT
 			fs.id AS id,
-			fs.name AS name,
 			fs.arrival_date AS arrivalDate,
+			fs.image_url AS imageUrl,
+			fs.name AS name,
 			fs.unit_weight AS unitWeight,
 			fs.quantity AS quantity,
 			fs.total_price AS totalPrice,
@@ -44,7 +46,8 @@
 			arrival_date AS arrivalDate,
 			unit_weight AS unitWeight,
 			quantity,
-			total_price AS totalPrice
+			total_price AS totalPrice,
+			image_url AS imageUrl
 		FROM food_stock 
 	</select>
 

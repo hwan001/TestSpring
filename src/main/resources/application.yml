@@ -1,0 +1,14 @@
+# src/main/resources/application.yml
+db:
+  mariadb:
+    driver: org.mariadb.jdbc.Driver
+    url: jdbc:mariadb://mariadb:3306/householdledger
+    username: HJH
+    password: HJH
+    mapper: classpath*:mapper/mariadb/*.xml
+  oracle:
+    driver: oracle.jdbc.OracleDriver
+    url: jdbc:oracle:thin:@db.avgmax.in:1521:xe
+    username: HJH
+    password: HJH
+    mapper: classpath*:mapper/oracle/*.xml

@@ -13,6 +13,7 @@ public class FoodStockDto {
     private double unitWeight;
     private int quantity;
     private double totalPrice;
+    private String imageUrl;
 
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate arrivalDate;

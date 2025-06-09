@@ -1,4 +1,4 @@
-package com.mybatis;
+package com.example.config;
 
 import javax.sql.DataSource;
 
@@ -9,30 +9,41 @@ import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.beans.factory.annotation.Value;
 
 import com.zaxxer.hikari.HikariDataSource;
 
 @Configuration
 @MapperScan("com.example.mapper")
+@PropertySource(value = "classpath:application.yml", factory = YamlPropertySourceFactory.class)
 public class MyBatisConfig {
+    
+    @Value("${db.mariadb.driver}")
+    private String driver;
 
-/*     @Bean
-    public DataSource dataSource() {
-        HikariDataSource ds = new HikariDataSource();
-        ds.setDriverClassName("oracle.jdbc.OracleDriver");
-        ds.setJdbcUrl("jdbc:oracle:thin:@db.avgmax.in:1521:xe");
-        ds.setUsername("HJH");
-        ds.setPassword("HJH");
-        return new HikariDataSource(ds);
-    } */
+    @Value("${db.mariadb.url}")
+    private String url;
+
+    @Value("${db.mariadb.username}")
+    private String username;
+
+    @Value("${db.mariadb.password}")
+    private String password;
+
+    @Value("${db.mariadb.mapper}")
+    private String mapperPath;
+
 
     @Bean
     public DataSource dataSource() {
         HikariDataSource ds = new HikariDataSource();
-        ds.setDriverClassName("org.mariadb.jdbc.Driver");
-        ds.setJdbcUrl("jdbc:mariadb://mariadb:3306/householdledger");
-        ds.setUsername("HJH");
-        ds.setPassword("HJH");
+
+        ds.setDriverClassName(driver);
+        ds.setJdbcUrl(url);
+        ds.setUsername(username);
+        ds.setPassword(password);
+
         return new HikariDataSource(ds);
     }
 
@@ -41,7 +52,7 @@ public class MyBatisConfig {
         SqlSessionFactoryBean factory = new SqlSessionFactoryBean();
         factory.setDataSource(dataSource);
         factory.setMapperLocations(
-                new PathMatchingResourcePatternResolver().getResources("classpath*:mapper/mariadb/*.xml")); // mapper path
+                new PathMatchingResourcePatternResolver().getResources(mapperPath));
         return factory.getObject();
     }
 

@@ -5,8 +5,9 @@ import lombok.Data;
 @Data
 public class StockSummaryDto {
     private int id;
-    private String name;
     private String arrivalDate;
+    private String imageUrl;
+    private String name;
     private double unitWeight;
     private int quantity;
     private double totalPrice;
