@@ -29,8 +29,25 @@ services:
     networks:
       - backend
 
+  # minio:
+  #   image: minio/minio:latest
+  #   container_name: minio
+  #   ports:
+  #     - "9000:9000"   # S3 API
+  #     - "9001:9001"   # Web UI
+  #   volumes:
+  #     - minio-data:/data
+  #   environment:
+  #     MINIO_ROOT_USER: minioadmin      # 기본 접근 아이디
+  #     MINIO_ROOT_PASSWORD: minioadmin  # 기본 비밀번호
+  #   command: server /data --console-address ":9001"
+  #   restart: unless-stopped
+  #   networks:
+  #     - backend
+
 volumes:
   mariadb-data:
+  # minio-data:
 
 networks:
   backend:
