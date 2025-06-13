@@ -11,13 +11,8 @@ import org.springframework.ui.Model;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.multipart.MultipartFile;
-// import org.springframework.web.bind.annotation.RequestMapping;
-
-import javax.servlet.http.HttpServletRequest;
 
 import java.util.List;
-import java.io.File;
-import java.io.IOException;
 import java.util.UUID;
 
 import org.slf4j.Logger;
@@ -27,15 +22,30 @@ import com.example.dto.FoodStockDto;
 import com.example.dto.FoodUsageDto;
 import com.example.dto.StockSummaryDto;
 import com.example.service.InventoryService;
+import com.example.service.MinioService;
+
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.beans.factory.annotation.Value;
+import com.example.config.YamlPropertySourceFactory;
 
 
 @Controller
 @RequestMapping("/inventory")
+@PropertySource(value = "classpath:application.yml", factory = YamlPropertySourceFactory.class)
 public class InventoryController {
     private static final Logger logger = LoggerFactory.getLogger(InventoryController.class);
 
     @Autowired
     private InventoryService inventoryService;
+    
+    @Autowired
+    private MinioService minioService;
+
+    @Value("${file.minio.publicUrl}")
+    private String publicMinioUrl;
+    
+    @Value("${file.minio.bucketName}")
+    private String bucket;
 
     @PostMapping("/addStock")
     @ResponseBody
@@ -74,26 +84,29 @@ public class InventoryController {
 
     @PostMapping("/upload")
     @ResponseBody
-    public String uploadFoodImage(@RequestParam("file") MultipartFile file, HttpServletRequest request) throws IOException {
-        if (file.isEmpty()) return "파일 없음";
-
-        // 저장 경로 설정 (서버의 실제 경로로 변환)
-        String uploadDir = request.getServletContext().getRealPath("/uploads");
-        File dir = new File(uploadDir);
-        if (!dir.exists()) {
-            dir.mkdirs();
-            dir.setReadable(true, false);
-            dir.setWritable(true, false);
-        }
+    public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) {
+        try {
+            if (file.isEmpty()) {
+                return ResponseEntity.badRequest().body("파일 없음");
+            }
     
-        // 파일 저장
-        String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
-        File dest = new File(dir, fileName);
-        dest.setReadable(true, false);
-        dest.setWritable(true, false);
-        file.transferTo(dest);
+            String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
+            
+            minioService.uploadFile(
+                fileName,
+                file.getInputStream(),
+                file.getSize(),
+                file.getContentType()
+            );
 
-        // 업로드된 이미지 경로 반환
-        return "/uploads/" + fileName;
+            String publicUrl = publicMinioUrl + "/" + bucket + "/" + fileName;
+            return ResponseEntity.ok(publicUrl);
+        } catch (Exception e) {
+            e.printStackTrace();  // 서버 로그에 전체 에러 출력
+            return ResponseEntity.status(500).body("파일 업로드 실패: " + e.getMessage());
+        }
     }
+    
+
+
 }

@@ -12,3 +12,24 @@ db:
     username: HJH
     password: HJH
     mapper: classpath*:mapper/oracle/*.xml
+file:
+  minio-dev:
+    server: http://localhost:9000
+    publicUrl: http://minio:9000
+    region: us-east-1
+    userId: minioadmin
+    userPw: minioadmin
+    bucketName: food-images
+  minio:
+    server: https://minio.avgmax.team
+    publicUrl: https://minio.avgmax.team
+    region: us-east-1
+    userId: avgmaxminioadmin
+    userPw: avgmaxminioadmin
+    bucketName: food-images
+  minio-aws:
+    server: https://s3.amazonaws.com     # AWS S3 엔드포인트
+    region: us-east-1
+    userId: <AWS_ACCESS_KEY>
+    userPw: <AWS_SECRET_KEY>
+    bucketName: your-bucket-name
